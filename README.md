@@ -20,6 +20,14 @@ It is designed specifically for **Python developers working with PLCs**, as well
 
 ---
 
+💬 Why This Project?
+
+Many automation projects today use Python for data logging, UI, or higher-level logic—but integrating it with a Mitsubishi PLC is rarely straightforward due to lack of official libraries or public MC Protocol examples.
+
+This module was created to bridge that gap.
+It offers a lightweight, Python-based solution for directly controlling PLCs and actuators, without relying on specialized I/O cards or proprietary software. By using serial communication with MC Protocol, we enable a more balanced and cost-effective approach to PC-based control — one that fully leverages Python’s strengths in flexibility, speed of development, and system integration.
+
+---
 ## 📁 File Structure
 
 | File               | Description |
@@ -47,4 +55,3 @@ cmd2 = mc.commant_random(['D100', 'D101'], dec_to_ascii_hex_list([10, 20]))
 
 # Write 32-bit value (30000000) into D10 (high), D11 (low)
 cmd3 = mc.commant_random(['D10', 'D11'], dec32_to_Dword_ascii([30000000]))
-
