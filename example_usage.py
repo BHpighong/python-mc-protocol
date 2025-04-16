@@ -1,3 +1,8 @@
+"""
+File: example_usage.py
+Author: bh.hong
+"""
+
 from mc_protocol_rw import McProtocolRW
 from utils import dec_to_ascii_hex_list, dec32_to_Dword_ascii
 

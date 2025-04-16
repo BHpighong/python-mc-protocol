@@ -1,7 +1,7 @@
 """
-目的 : 產出MC_Protocol 的指令
 file name : mc_protocol_rw.py
 Author: bh.hong
+目的 : 產出MC_Protocol 的指令
 """
 
 class McProtocolRW:
@@ -40,21 +40,8 @@ class McProtocolRW:
 
     def str_to_ascii (self, address_int, length):
         """定義from int to hex(Ascii),給定int,格子數"""
-        i=0
-        arr = list(str(address_int)) #int >>str >>矩陣
-        address_arr = ['0']*length #定義一個矩陣裝入address
-        for i in range (len(arr)) : #前面補0
-            address_arr[length-1-i] = arr[len(arr)-1-i]
-        #print(address_arr)
-
-        #矩陣 from ascii 一個一個 to Hex
-        address_ascii = [30]* length #避免錯誤定預設0 >> ascii=30
-        for i in range (length):
-            address_ascii[length-1-i] = format(ord(address_arr[length-1-i]), 'X')
-
-        address_str = ' '
-
-        return address_str.join(address_ascii) #Convert a list to string out put
+        msg = str(address_int).zfill(length) #int >>str >>補0
+        return  ' '.join([format(ord(c), 'X') for c in msg]) #str >>ascii
 
     def point_status_qty (self, point_status):
         """點位輸狀態；配合點位數量(實際輸出為先數量再狀態)"""
@@ -72,12 +59,9 @@ class McProtocolRW:
     def check_sum(self, data):
         """ 求CRC校驗碼 """
         sum_check_code = sum(int(x, 16) for x in data.split(' ')) # 將list的int加總
-        code1 = f"{sum_check_code:X}"[-2]  # 將轉為 ASCII
-        code2 = f"{sum_check_code:X}"[-1]  # 將轉為 ASCII
-        #print (code1, code1) #印出來確認values
-        check_code = format(ord(code1), "x") +' '+ format(ord(code2), "x")
-
-        return check_code
+        code = f"{sum_check_code:X}"[-2:]
+        # print(' '.join([format(ord(c), "x") for c in code]))
+        return ' '.join([format(ord(c), "x") for c in code]) #將ASCII轉為HEX
 
     def build_command_payload(self, headdevice, values, command_code):
         """ pay load building """
@@ -143,7 +127,10 @@ class McProtocolRW:
     def command_batch(self, headdevice, values):
         """ batch 命令 """
         command_code = 14010001
-        payload, device_code, device_address, data_payload = self.build_command_payload(headdevice, values, command_code)
+        payload, device_code, device_address, data_payload = self.build_command_payload(headdevice,
+        values,
+        command_code
+        )
         return self.format_packet(payload, device_code, device_address, data_payload, command_code)
 
     def build_random_write_payload(self, headdevices, values, is_bit=True):
@@ -160,7 +147,9 @@ class McProtocolRW:
                 device_address = self.str_to_ascii(device[1:], 6)
                 status_ascii = self.str_to_ascii(values[i], 2)
                 word_pack += f" {device_code} {device_address} {status_ascii}"
-            crc_components = ' '.join([self.frame_code, self.str_to_ascii(command_code, 8), qty]) + word_pack
+            crc_components = ' '.join([self.frame_code,
+                                       self.str_to_ascii(command_code, 8),
+                                       qty]) + word_pack
         else:
             command_code = '14020000'
             qty_words = self.str_to_ascii(len(headdevices), 2)
@@ -170,7 +159,9 @@ class McProtocolRW:
                 device_code = self.device_code_define(device[0])
                 device_address = self.str_to_ascii(device[1:], 6)
                 word_pack += f" {device_code} {device_address} {values[i]}"
-            crc_components = ' '.join([self.frame_code, self.str_to_ascii(command_code, 8), qty_words, qty_dwords]) + word_pack
+            crc_components = ' '.join([self.frame_code,
+                                       self.str_to_ascii(command_code, 8),
+                                       qty_words, qty_dwords]) + word_pack
 
         crc = self.check_sum(crc_components)
         packet = f"{self.enq_code} {crc_components} {crc} {self.end_code}"
@@ -184,5 +175,10 @@ class McProtocolRW:
     def command_batch_read (self, headdevice, values):
         """ batch 讀取命令"""
         command_code = '04010001' #0401, 0001
-        payload, device_code, device_address, data_payload = self.build_command_payload_by_values(headdevice, values, command_code)
+        cmd_result = self.build_command_payload_by_values(headdevice,
+        values,
+        command_code
+        )
+
+        payload, device_code, device_address, data_payload = cmd_result
         return self.format_packet(payload, device_code, device_address, data_payload, command_code)
