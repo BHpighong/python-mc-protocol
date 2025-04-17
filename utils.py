@@ -1,6 +1,6 @@
-# utils.py
 """
 Utility functions for Mitsubishi PLC data handling
+file_name: utils.py
 Author: bh.hong
 Date: 2025-April
 """
@@ -15,10 +15,10 @@ def dec_to_ascii_hex_list(values, length=4):
     ascii_list = []
     for v in values:
         hex_str = f"{v:X}"
-        ascii_list.append(mc.str_to_ascii(hex_str, length))
+        ascii_list.append(mc.to_ascii_hex_string(hex_str, length))
     return ascii_list
 
-def dec32_to_Dword_ascii(dec_values):
+def dec32_to_Dword_ascii(dec_values): #pylint: disable=invalid-name
     """
     將 32-bit 十進位數轉為兩段 16-bit（高低位）ASCII Hex字串。
     傳回格式為 [D_Low, D_High]
@@ -28,6 +28,6 @@ def dec32_to_Dword_ascii(dec_values):
         hex32 = f"{val:08X}"  # 保留8位16進位
         low_word = hex32[4:]  # 後4位 → D_Low
         high_word = hex32[:4] # 前4位 → D_High
-        split_ascii.append(mc.str_to_ascii(low_word, 4))  # 低位
-        split_ascii.append(mc.str_to_ascii(high_word, 4)) # 高位
+        split_ascii.append(mc.to_ascii_hex_string(low_word, 4))  # 低位
+        split_ascii.append(mc.to_ascii_hex_string(high_word, 4)) # 高位
     return split_ascii
